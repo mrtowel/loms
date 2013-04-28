@@ -32,6 +32,11 @@ class CaseAdmin(admin.ModelAdmin):
     inlines = (EventInline, CaseFileInline,)
     form = CaseForm
 
+    def save_model(self, request, obj, form, change):
+        form = CaseFileForm
+        self.user = request.user
+        obj.save()
+
 
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
