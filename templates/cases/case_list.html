@@ -1,0 +1,10 @@
+{% extends "cases/base_case.html" %}
+
+{% block content %}
+    <h1>Case List</h1>
+    <ul>
+        {% for case in list %}
+            <li>[{{ case.prosecutor.all }}] vs. [{{ case.defendant_names }}] @amount: {{ case.dispute_amount }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
