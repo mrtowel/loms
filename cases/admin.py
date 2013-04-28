@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin, User
 
-from models import Case, Event
+from models import Case, Event, CaseFile
 from .forms import CaseForm
 from .forms import CustomUserCreationForm
 
@@ -11,10 +11,15 @@ class EventInline(admin.TabularInline):
     extra = 2
 
 
+class CaseFileInline(admin.TabularInline):
+    model = CaseFile
+    extra = 2
+
+
 class CaseAdmin(admin.ModelAdmin):
     model = Case
     list_display = ('signature', 'prosecutor_names', 'defendant_names', 'dispute_amount', 'date_added', )
-    inlines = (EventInline,)
+    inlines = (EventInline, CaseFileInline)
     form = CaseForm
 
 

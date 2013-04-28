@@ -38,7 +38,7 @@ class Case(models.Model):
     )
 
     dispute_amount = models.TextField(max_length=31)
-    docs = models.FileField(upload_to='case_docs', blank=True)
+    #docs = models.FileField(upload_to='case_docs', blank=True)
     # category = models.CharField(max_length=255)
     date_added = models.DateTimeField(auto_now=True)
 
@@ -61,6 +61,14 @@ class Event(models.Model):
     date = models.DateTimeField()
     time = models.TimeField()
     date_added = models.DateTimeField(auto_now_add=True)
+
+
+class CaseFile(models.Model):
+    def get_path(instance, filename):
+        return 'case_id_%s_docs/%s' % (instance.case.id, filename)
+
+    case = models.ForeignKey(Case)
+    file = models.FileField(upload_to=get_path)
 
 
 def check_prosecutor(sender, instance, **kwargs):
