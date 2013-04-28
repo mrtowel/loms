@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
-from .models import Case, UserFullName
+from .models import Case, UserFullName, CaseFile
 
 
 class CaseForm(forms.ModelForm):
@@ -35,6 +35,11 @@ class CaseForm(forms.ModelForm):
             print 'defendant prosecutor admin form'
 
         return super(CaseForm, self).clean()
+
+
+class CaseFileForm(forms.ModelForm):
+    class Meta:
+        model = CaseFile
 
 
 class CustomUserCreationForm(forms.ModelForm):

@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin, User
 from models import Case, Event, CaseFile
 from .forms import CaseForm
 from .forms import CustomUserCreationForm
+from .forms import CaseFileForm
 
 
 class EventInline(admin.TabularInline):
@@ -11,15 +12,24 @@ class EventInline(admin.TabularInline):
     extra = 2
 
 
-class CaseFileInline(admin.TabularInline):
+class CaseFileInline(admin.StackedInline):
     model = CaseFile
-    extra = 2
+    extra = 1
+    fields = ('file', 'date_added', 'user')
+    readonly_fields = ('date_added', 'user')
+    form = CaseFileForm
+
+    def decrypt_date_added(self, obj):
+        if obj.date_added:
+            decrypt(obj.date_added)
+        else:
+            self.readonly_fields = ('date_added', 'file',)
 
 
 class CaseAdmin(admin.ModelAdmin):
     model = Case
     list_display = ('signature', 'prosecutor_names', 'defendant_names', 'dispute_amount', 'date_added', )
-    inlines = (EventInline, CaseFileInline)
+    inlines = (EventInline, CaseFileInline,)
     form = CaseForm
 
 

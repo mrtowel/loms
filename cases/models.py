@@ -62,6 +62,9 @@ class Event(models.Model):
     time = models.TimeField()
     date_added = models.DateTimeField(auto_now_add=True)
 
+    def __unicode__(self):
+        return self.name
+
 
 class CaseFile(models.Model):
     def get_path(instance, filename):
@@ -69,6 +72,11 @@ class CaseFile(models.Model):
 
     case = models.ForeignKey(Case)
     file = models.FileField(upload_to=get_path)
+    date_added = models.DateTimeField(auto_now=True)
+    user = models.OneToOneField(User, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.file.name
 
 
 def check_prosecutor(sender, instance, **kwargs):
