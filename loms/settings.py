@@ -1,11 +1,12 @@
 # coding=utf-8
+from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     ('Przemysław Bis', "przemyslaw.bis@gmail.com"),
-)
+    )
 
 MANAGERS = ADMINS
 
@@ -80,7 +81,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
+    )
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '9*gqk3fg@ot-_qi(y!*kp@*gy6y(z5#(*&@=_8939m#8=c^14c'
@@ -90,7 +91,11 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
     #     'django.template.loaders.eggs.Loader',
-)
+    )
+
+TEMPLATE_CONTEXT_PROCESSORS = TCP + (
+    'django.core.context_processors.request',
+    )
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -100,7 +105,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+    )
 
 ROOT_URLCONF = 'loms.urls'
 
@@ -125,7 +130,11 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'cases',
     'south',
-)
+    'filer',
+    'mptt',
+    'easy_thumbnails',
+    'django_select2',
+    )
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -155,3 +164,65 @@ LOGGING = {
         },
     }
 }
+
+SUIT_CONFIG = {
+    # header
+    'ADMIN_NAME': 'Law Office Management System',
+    'HEADER_DATE_FORMAT': 'l, j. F Y',
+    'HEADER_TIME_FORMAT': 'H:i',
+
+    # forms
+    'SHOW_REQUIRED_ASTERISK': True, # Default True
+    'CONFIRM_UNSAVED_CHANGES': True, # Default True
+
+    # menu
+    'SEARCH_URL': '/admin/auth/user/',
+    'MENU_ICONS': {
+        'sites': 'icon-leaf',
+        'auth': 'icon-lock',
+    },
+    'MENU_OPEN_FIRST_CHILD': True, # Default True
+    # 'MENU_EXCLUDE': ('auth.group',),
+    'MENU': (
+
+        # Keep original label and models
+        'sites',
+
+        # Rename app and set icon
+        {'app': 'auth', 'label': 'Authorization', 'icon': 'icon-lock'},
+
+        # Reorder app models
+        # {'app': 'auth', 'models': ('user', 'group')},
+
+        # Custom app, with models
+        {'label': 'Office', 'icon': 'icon-cog', 'models': ('cases.case', 'cases.event')},
+
+        # Cross-linked models with custom name; Hide default icon
+        #        {'label': 'Custom', 'icon':None, 'models': (
+        #            'auth.group',
+        #            {'model': 'auth.user', 'label': 'Staff'}
+        #        )},
+
+        # Custom app, no models (child links)
+        #        {'label': 'Users', 'url': 'auth.user', 'icon':'icon-user'},
+
+        # Separator
+        '-',
+
+        # Custom app and model with permissions
+        {'label': 'Secure', 'permissions': 'auth.add_user', 'models': [
+            {'label': 'custom-child', 'permissions': ('auth.add_user', 'auth.add_group')}
+        ]},
+        ),
+
+    # misc
+    'LIST_PER_PAGE': 15,
+}
+
+THUMBNAIL_PROCESSORS = (
+    'easy_thumbnails.processors.colorspace',
+    'easy_thumbnails.processors.autocrop',
+    #'easy_thumbnails.processors.scale_and_crop',
+    'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+    'easy_thumbnails.processors.filters',
+    )

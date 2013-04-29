@@ -5,8 +5,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator, ValidationError
 from django.db.models.signals import m2m_changed, pre_save
-
-from datetime import datetime
+from filer.fields.file import FilerFileField
+from filer.fields.folder import FilerFolderField
 
 
 class UserFullName(User):
@@ -14,9 +14,9 @@ class UserFullName(User):
         proxy = True
 
     def __unicode__(self):
-        return_string = '%s [user id: %s]' % (self.get_full_name(), self.id)
+        return_string = '%s ' % (self.get_full_name())
         if self.email:
-            return_string += '[email: %s]' % self.email
+            return_string += '<%s>' % self.email
         return return_string
 
 
@@ -32,15 +32,13 @@ class Case(models.Model):
                 message='invalid signature'
             )
         ],
-        #unique=True,
         blank=True,
         default='NA00/0000'
     )
 
     dispute_amount = models.TextField(max_length=31)
-    #docs = models.FileField(upload_to='case_docs', blank=True)
-    # category = models.CharField(max_length=255)
     date_added = models.DateTimeField(auto_now=True)
+    folder = FilerFolderField(blank=True, null=True)
 
     def __unicode__(self):
         return self.signature
@@ -67,19 +65,11 @@ class Event(models.Model):
 
 
 class CaseFile(models.Model):
-    def get_path(instance, filename):
-	return 'case_id_%s_docs/%s' % (instance.case.id, filename)
+    def get_folder_name(instance):
+        return instance.case.folder
 
     case = models.ForeignKey(Case)
-    file = models.FileField(upload_to=get_path)
-    date_added = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, blank=True, null=True)
-    size = models.CharField(max_length=100)
-    content_type = models.CharField(max_length=100)
-
-    def __unicode__(self):
-        return self.file.name
-
+    file = FilerFileField(blank=True, null=True, parent_link=get_folder_name)
 
 
 def check_prosecutor(sender, instance, **kwargs):
