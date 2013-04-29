@@ -68,15 +68,18 @@ class Event(models.Model):
 
 class CaseFile(models.Model):
     def get_path(instance, filename):
-        return 'case_id_%s_docs/%s' % (instance.case.id, filename)
+	return 'case_id_%s_docs/%s' % (instance.case.id, filename)
 
     case = models.ForeignKey(Case)
     file = models.FileField(upload_to=get_path)
     date_added = models.DateTimeField(auto_now=True)
-    user = models.OneToOneField(User, blank=True, null=True)
+    user = models.ForeignKey(User, blank=True, null=True)
+    size = models.CharField(max_length=100)
+    content_type = models.CharField(max_length=100)
 
     def __unicode__(self):
         return self.file.name
+
 
 
 def check_prosecutor(sender, instance, **kwargs):
