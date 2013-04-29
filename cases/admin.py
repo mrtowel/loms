@@ -15,27 +15,33 @@ class EventInline(admin.TabularInline):
 class CaseFileInline(admin.StackedInline):
     model = CaseFile
     extra = 1
-    fields = ('file', 'date_added', 'user')
-    readonly_fields = ('date_added', 'user')
+    fields = ('file','size', 'content_type', 'date_added', 'user',)
+    readonly_fields = ('date_added', 'user', 'size', 'content_type',)
     form = CaseFileForm
 
     def decrypt_date_added(self, obj):
         if obj.date_added:
             decrypt(obj.date_added)
-        else:
-            self.readonly_fields = ('date_added', 'file',)
-
 
 class CaseAdmin(admin.ModelAdmin):
     model = Case
     list_display = ('signature', 'prosecutor_names', 'defendant_names', 'dispute_amount', 'date_added', )
     inlines = (EventInline, CaseFileInline,)
     form = CaseForm
-
-    def save_model(self, request, obj, form, change):
-        form = CaseFileForm
-        self.user = request.user
-        obj.save()
+    
+    def save_formset(self,request,form,formset,change):
+	if formset.model != CaseFile:
+	    return super(CaseAdmin, self).save_formset(request,form,formset,change)
+	else:
+	    instances = formset.save(commit=False)
+	    for instance in instances:
+		if change:
+		    instance.user = request.user
+		    file = str(instance.file)
+		    instance.content_type = file[file.rfind('.'):]
+		    instance.size = instance.file.size
+		instance.save()
+		
 
 
 class CustomUserAdmin(UserAdmin):
